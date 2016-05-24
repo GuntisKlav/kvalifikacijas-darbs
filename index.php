@@ -9,8 +9,8 @@ $lietotajvards = ""; //Lietotājvārds
 $epasts1 = ""; //Epasts
 $epasts2 = ""; //Atkārtots epasts
 $parole1 = ""; //Parole
-$prole2 = ""; //Atkārtota parole
-$datums = ""; //Reģistrēšanās datums
+$parole2 = ""; //Atkārtota parole
+$d = ""; //Reģistrēšanās datums
 
 $lietotaj_parb = ""; //Pārbauda vai lietotājvārds eksistē
 
@@ -23,52 +23,62 @@ $parole1 = strip_tags(@$_POST['parole1']);
 $parole2 = strip_tags(@$_POST['parole2']);
 $d = date("G-m-d"); //Gads - mēnesis - diena
 
-if($submit){
-	if ($epasts1 == $epasts2) {
-		//Pārbauda vai lietotājs jau eksistē
-		$lietotaj_parb = mysql_query("SELECT lietotajvards FROM lietotaji WHERE lietotajvards = '$lietotajvards'");
-
-		//Izskaita rindas kur lietotājvārds = $lietotajvards
-		$rindu_parbaude = mysql_num_rows($lietotaj_parb);
-		if ($rindu_parbaude == 0) {
-//Pārbauda, vai visi lauki ir aizpildīti
-			if ($vards&&$uzvards&&$lietotajvards&&$epasts1&&$epasts2&&$parole1&$parole2) {
-				//Pārbauda, vai paroles sakrīt
-				if($parole1 == $parole2){
-if (strlen($lietotajvards)>25||strlen($vards)>25||strlen($uzvards>25)) {
-	echo "Maksimālais simbolu skaits vārdam, uzvārdam un lietotājvārdam ir 25 simboi!";
+if ($submit) {
+if ($epasts1==$epasts2) {
+// Pārbauda vai lietotājs jau eksistē
+$lietotaj_parb = mysql_query("SELECT lietotajvards FROM lietotaji WHERE lietotajvards='$lietotajvards'");
+$check = mysql_num_rows($lietotaj_parb);
+//Pābauda vai epasts eksistē DB
+$e_check = mysql_query("SELECT epasts FROM lietotaji WHERE epasts='$epasts1'");
+//Count the number of rows returned
+$email_check = mysql_num_rows($e_check);
+if ($check == 0) {
+  if ($email_check == 0) {
+//check all of the fields have been filed in
+if ($vards && $uzvards && $lietotajvards && $epasts1 && $epasts2 && $parole1 && $parole2) {
+// check that passwords match
+if ($parole1==$parole2) {
+// check the maximum length of username/first name/last name does not exceed 25 characters
+if (strlen($lietotajvards)>25||strlen($vards)>25||strlen($uzvards)>25) {
+echo "The maximum limit for username/first name/last name is 25 characters!";
 }
 else
 {
+// check the maximum length of password does not exceed 25 characters and is not less than 5 characters
 if (strlen($parole1)>30||strlen($parole1)<5) {
-	echo "Parolei jābūt garakai par 5 simboliem un mazākai nekā 30 simboli!";
+echo "Your password must be between 5 and 30 characters long!";
 }
 else
 {
+//encrypt password and password 2 using md5 before sending to database
 $parole1 = md5($parole1);
-	$parole2 = md5($parole2);
-	$query = mysql_query("INSERT INTO lietotaji VALUES('', '$lietotajvards', '$vards', '$uzvards', $epasts1, '$parole1', '$datums', '0')");
-	die("<h2>Laipni lūgts Mountain Maniacs</h2> Ielogojies savā kontā, lai sāktu...");
+$parole2 = md5($parole2);
+$query = mysql_query("INSERT INTO lietotaji VALUES ('','$lietotajvards','$vards','$uzvards','$epasts1','$parole1','$d','0')");
+die("<h2>Welcome to findFriends</h2>Login to your account to get started ...");
 }
 }
 }
-else{
-echo "Paroles nesakrīt!";
-}		
-}
-
-else{
-echo "Lūdzu aizpildi visus laukus!";
-}		
-}
-
-else{
-echo "Šāds lietotājvārds jau pasāv!";
+else {
+echo "Your passwords don't match!";
 }
 }
-
-else{
-echo "Epasti nesakrīt!";
+else
+{
+echo "Please fill in all of the fields";
+}
+}
+else
+{
+ echo "Sorry, but it looks like someone has already used that email!";
+}
+}
+else
+{
+echo "Username already taken ...";
+}
+}
+else {
+echo "Your E-mails don't match!";
 }
 }
 
@@ -91,4 +101,5 @@ echo "Epasti nesakrīt!";
 	</form>	
 	</div>
 	</div>
+	<h1> .</h1>
 <?php include ("./inc/footer.inc.php"); ?>
