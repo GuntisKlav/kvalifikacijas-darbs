@@ -1,5 +1,5 @@
 <?php include ("./inc/header.inc.php"); ?>
-
+ 
 <?php 
 $submit = @$_POST['submit'];
 
